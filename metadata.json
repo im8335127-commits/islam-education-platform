@@ -1,0 +1,8 @@
+{
+  "name": "المنصة",
+  "description": "نظام متكامل لإدارة الطلاب باستخدام Google Sheets كقاعدة بيانات مع واجهة عربية RTL متكاملة ودعم Google Apps Script",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
