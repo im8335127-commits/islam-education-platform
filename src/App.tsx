@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  initAuth, 
-  googleSignIn, 
-  googleSignOut, 
-  auth 
+import {
+  initAuth,
+  googleSignIn,
+  googleSignOut,
+  auth
 } from './googleAuth';
-import { 
-  createSpreadsheet, 
-  fetchStudents, 
-  addStudent, 
-  updateStudent, 
+import {
+  createSpreadsheet,
+  fetchStudents,
+  addStudent,
+  updateStudent,
   deleteStudent,
   getSpreadsheetTitle,
   fetchAttendanceLogs,
@@ -22,31 +22,31 @@ import {
   savePaymentRecord
 } from './sheetsService';
 import { Student, AttendanceLog, GradeEntry, UserCredential, PaymentRecord } from './types';
-import { 
-  APPS_SCRIPT_CODE_GS, 
-  APPS_SCRIPT_INDEX_HTML, 
-  APPS_SCRIPT_STYLESHEET_HTML, 
-  APPS_SCRIPT_JAVASCRIPT_HTML 
+import {
+  APPS_SCRIPT_CODE_GS,
+  APPS_SCRIPT_INDEX_HTML,
+  APPS_SCRIPT_STYLESHEET_HTML,
+  APPS_SCRIPT_JAVASCRIPT_HTML
 } from './appsScriptSource';
-import { 
-  Search, 
-  Plus, 
-  Trash2, 
-  Edit3, 
-  FileSpreadsheet, 
-  LogOut, 
-  Info, 
-  Code, 
-  GraduationCap, 
-  Phone, 
-  CheckCircle, 
-  AlertCircle, 
-  TrendingUp, 
-  Check, 
-  Copy, 
-  X, 
-  Sparkles, 
-  BookOpen, 
+import {
+  Search,
+  Plus,
+  Trash2,
+  Edit3,
+  FileSpreadsheet,
+  LogOut,
+  Info,
+  Code,
+  GraduationCap,
+  Phone,
+  CheckCircle,
+  AlertCircle,
+  TrendingUp,
+  Check,
+  Copy,
+  X,
+  Sparkles,
+  BookOpen,
   HelpCircle,
   FolderOpen,
   RefreshCw
@@ -335,8 +335,8 @@ export default function App() {
     try {
       const users = await fetchUsers(token, spreadsheetId);
       const matched = users.find(
-        u => u.username.trim().toLowerCase() === teacherUsername.trim().toLowerCase() && 
-             u.password.trim() === teacherPassword.trim()
+        u => u.username.trim().toLowerCase() === teacherUsername.trim().toLowerCase() &&
+          u.password.trim() === teacherPassword.trim()
       );
 
       if (matched) {
@@ -517,7 +517,7 @@ export default function App() {
       const title = await getSpreadsheetTitle(token, spreadsheetId);
       setSpreadsheetTitle(title);
       localStorage.setItem('student_mgmt_spreadsheet_id', spreadsheetId);
-      
+
       // Auto-ensure the grades sheet and attendance sheet are created
       try {
         await ensureGradesSheetExists(token, spreadsheetId);
@@ -691,15 +691,15 @@ export default function App() {
   const openCollectPayment = (student: Student) => {
     setCollectPaymentStudent(student);
     setPaymentAmount('');
-    
+
     // Find latest payment record for this student to pre-populate total fees
     const latestRec = [...paymentRecords]
       .reverse()
       .find(r => r.studentCode === student.code);
-      
+
     setPaymentTotalFees(latestRec ? latestRec.totalFees.toString() : '1000');
     setPaymentNotes('');
-    
+
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -744,12 +744,12 @@ export default function App() {
 
       await savePaymentRecord(token, spreadsheetId, record);
       showNotification(`تم تسجيل دفعة بقيمة ${amount} جنيه للطالب ${collectPaymentStudent.name} بنجاح`);
-      
+
       // Close modal and reset fields
       setCollectPaymentStudent(null);
       setPaymentAmount('');
       setPaymentNotes('');
-      
+
       // Reload payment records to refresh list and values
       await loadPaymentRecords();
     } catch (err: any) {
@@ -822,7 +822,7 @@ export default function App() {
 
     // Update locally for instant user response
     setStudents(prev => prev.map(s => s.code === student.code ? updatedStudent : s));
-    
+
     // Set saving loading state for this specific student and action
     setSavingStudentCodes(prev => ({ ...prev, [student.code]: isPresent ? 'present' : 'absent' }));
 
@@ -928,7 +928,7 @@ export default function App() {
       await loadGradeEntries();
 
       showNotification(`تم حفظ درجة الطالب "${gradesStudentName}" في مادة "${gradesSubject}" بنجاح! ✅`);
-      
+
       // Reset student details and score but keep Subject, Exam Name & Date for easier repetitive entry
       setGradesStudentCode('');
       setGradesStudentName('');
@@ -950,16 +950,16 @@ export default function App() {
 
   // Filter students based on search query and grade
   const filteredStudents = students.filter(student => {
-    const matchesSearch = student.code.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          student.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = student.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGrade = gradeFilter ? student.grade === gradeFilter : true;
     return matchesSearch && matchesGrade;
   });
 
   // Filter students for Teacher Dashboard
   const filteredDashboardStudents = students.filter(student => {
-    return student.code.toLowerCase().includes(dashboardSearchQuery.toLowerCase()) || 
-           student.name.toLowerCase().includes(dashboardSearchQuery.toLowerCase());
+    return student.code.toLowerCase().includes(dashboardSearchQuery.toLowerCase()) ||
+      student.name.toLowerCase().includes(dashboardSearchQuery.toLowerCase());
   });
 
   // Automatically update selected student if search returns a direct single exact code match
@@ -988,24 +988,24 @@ export default function App() {
 
   // Statistics calculations
   const totalStudents = students.length;
-  const avgAttendance = totalStudents > 0 
+  const avgAttendance = totalStudents > 0
     ? Math.round(students.reduce((sum, s) => sum + s.attendancePercentage, 0) / totalStudents)
     : 0;
   const gradesCount = Array.from(new Set(students.map(s => s.grade))).length;
-  
+
   // Find top student (based on Exam 1 score primarily, if numeric)
-  const topStudent = students.length > 0 
+  const topStudent = students.length > 0
     ? [...students].sort((a, b) => {
-        const scoreA = parseFloat(a.exam1 as string) || 0;
-        const scoreB = parseFloat(b.exam1 as string) || 0;
-        return scoreB - scoreA;
-      })[0]
+      const scoreA = parseFloat(a.exam1 as string) || 0;
+      const scoreB = parseFloat(b.exam1 as string) || 0;
+      return scoreB - scoreA;
+    })[0]
     : null;
 
   // --- Start of Parent Portal State-derived calculations ---
   // Filter logs for this specific student
   const parentStudentLogs = loggedInStudent ? attendanceLogs.filter(log => log.studentCode === loggedInStudent.code) : [];
-  
+
   // Sort logs descending (latest first)
   const parentSortedLogs = [...parentStudentLogs].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -1072,9 +1072,9 @@ export default function App() {
       return (
         <div className="max-w-md mx-auto my-12 bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-right animate-fade-in" dir="rtl">
           <div className="flex flex-col items-center text-center pb-6 border-b border-slate-100">
-            <img 
-              src={brandLogo} 
-              alt="منصة الأستاذ إسلام الشرقاوي" 
+            <img
+              src={brandLogo}
+              alt="منصة الأستاذ إسلام الشرقاوي"
               className="w-24 h-24 object-contain mb-3 drop-shadow-md select-none hover:scale-105 transition-transform duration-300"
               referrerPolicy="no-referrer"
             />
@@ -1115,9 +1115,9 @@ export default function App() {
     return (
       <div className="max-w-md mx-auto my-12 bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-right animate-fade-in" dir="rtl">
         <div className="flex flex-col items-center text-center pb-6 border-b border-slate-100">
-          <img 
-            src={brandLogo} 
-            alt="منصة الأستاذ إسلام الشرقاوي" 
+          <img
+            src={brandLogo}
+            alt="منصة الأستاذ إسلام الشرقاوي"
             className="w-24 h-24 object-contain mb-3 drop-shadow-md select-none hover:scale-105 transition-transform duration-300"
             referrerPolicy="no-referrer"
           />
@@ -1172,7 +1172,7 @@ export default function App() {
 
         <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-slate-400 text-[10px]">
           <span>الحساب متصل بـ Google: {user?.email}</span>
-          <button 
+          <button
             type="button"
             onClick={handleLogout}
             className="text-red-500 hover:text-red-600 font-bold transition-colors cursor-pointer"
@@ -1183,16 +1183,16 @@ export default function App() {
       </div>
     );
   };
- 
+
   // Render Login state with teacher / parent portal toggle if fully unauthenticated
   if (needsAuth && !loggedInStudent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6 font-sans" dir="rtl">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden animate-fade-in">
           <div className="flex flex-col items-center text-center p-8 bg-slate-50/50 border-b border-slate-100">
-            <img 
-              src={brandLogo} 
-              alt="منصة الأستاذ إسلام الشرقاوي" 
+            <img
+              src={brandLogo}
+              alt="منصة الأستاذ إسلام الشرقاوي"
               className="w-32 h-32 object-contain mb-4 drop-shadow-md select-none hover:scale-105 transition-transform duration-300"
               referrerPolicy="no-referrer"
             />
@@ -1207,11 +1207,10 @@ export default function App() {
                 setLoginTab('teacher');
                 setParentLoginError(null);
               }}
-              className={`flex-1 py-3 text-xs font-bold transition-all cursor-pointer rounded-xl ${
-                loginTab === 'teacher'
-                  ? 'bg-white text-brand-teal shadow-md'
-                  : 'text-slate-500 hover:text-brand-teal hover:bg-slate-50'
-              }`}
+              className={`flex-1 py-3 text-xs font-bold transition-all cursor-pointer rounded-xl ${loginTab === 'teacher'
+                ? 'bg-white text-brand-teal shadow-md'
+                : 'text-slate-500 hover:text-brand-teal hover:bg-slate-50'
+                }`}
             >
               🔐 بوابة المعلم
             </button>
@@ -1220,11 +1219,10 @@ export default function App() {
                 setLoginTab('parent');
                 setParentLoginError(null);
               }}
-              className={`flex-1 py-3 text-xs font-bold transition-all cursor-pointer rounded-xl ${
-                loginTab === 'parent'
-                  ? 'bg-white text-brand-teal shadow-md'
-                  : 'text-slate-500 hover:text-brand-teal hover:bg-slate-50'
-              }`}
+              className={`flex-1 py-3 text-xs font-bold transition-all cursor-pointer rounded-xl ${loginTab === 'parent'
+                ? 'bg-white text-brand-teal shadow-md'
+                : 'text-slate-500 hover:text-brand-teal hover:bg-slate-50'
+                }`}
             >
               👪 بوابة أولياء الأمور
             </button>
@@ -1326,9 +1324,9 @@ export default function App() {
       <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
         <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img 
-              src={appIcon} 
-              alt="منصة الأستاذ إسلام الشرقاوي" 
+            <img
+              src={appIcon}
+              alt="منصة الأستاذ إسلام الشرقاوي"
               className="w-10 h-10 object-contain rounded-lg shadow-sm"
               referrerPolicy="no-referrer"
             />
@@ -1342,61 +1340,55 @@ export default function App() {
           <div className="hidden md:flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1">
             <button
               onClick={() => setActiveTab('teacherDashboard')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'teacherDashboard' 
-                  ? 'bg-brand-teal text-white shadow-sm' 
-                  : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
-              }`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'teacherDashboard'
+                ? 'bg-brand-teal text-white shadow-sm'
+                : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
+                }`}
             >
               📊 لوحة التحكم
             </button>
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer ${
-                activeTab === 'dashboard' 
-                  ? 'bg-brand-teal text-white shadow-sm' 
-                  : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
-              }`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer ${activeTab === 'dashboard'
+                ? 'bg-brand-teal text-white shadow-sm'
+                : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
+                }`}
             >
               👥 الطلاب المقيدين
             </button>
             <button
               onClick={() => setActiveTab('attendance')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'attendance' 
-                  ? 'bg-brand-teal text-white shadow-sm' 
-                  : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
-              }`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'attendance'
+                ? 'bg-brand-teal text-white shadow-sm'
+                : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
+                }`}
             >
               📅 الحضور
             </button>
             <button
               onClick={() => setActiveTab('gradesEntry')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'gradesEntry' 
-                  ? 'bg-brand-teal text-white shadow-sm' 
-                  : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
-              }`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'gradesEntry'
+                ? 'bg-brand-teal text-white shadow-sm'
+                : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
+                }`}
             >
               📝 إدخال الدرجات
             </button>
             <button
               onClick={() => setActiveTab('parentPortal')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'parentPortal' 
-                  ? 'bg-brand-teal text-white shadow-sm' 
-                  : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
-              }`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'parentPortal'
+                ? 'bg-brand-teal text-white shadow-sm'
+                : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
+                }`}
             >
               👪 ولي الأمر
             </button>
             <button
               onClick={() => setActiveTab('appsScript')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'appsScript' 
-                  ? 'bg-brand-teal text-white shadow-sm' 
-                  : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
-              }`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'appsScript'
+                ? 'bg-brand-teal text-white shadow-sm'
+                : 'text-slate-600 hover:text-brand-teal hover:bg-white/60'
+                }`}
             >
               <Code className="w-3.5 h-3.5" /> Apps Script
             </button>
@@ -1442,130 +1434,124 @@ export default function App() {
       <div className="md:hidden bg-white border-b border-slate-200 px-4 py-2 flex gap-2 overflow-x-auto whitespace-nowrap">
         <button
           onClick={() => setActiveTab('teacherDashboard')}
-          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-            activeTab === 'teacherDashboard' 
-              ? 'bg-brand-teal text-white' 
-              : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
-          }`}
+          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${activeTab === 'teacherDashboard'
+            ? 'bg-brand-teal text-white'
+            : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
+            }`}
         >
           لوحة التحكم
         </button>
         <button
           onClick={() => setActiveTab('dashboard')}
-          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-            activeTab === 'dashboard' 
-              ? 'bg-brand-teal text-white' 
-              : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
-          }`}
+          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${activeTab === 'dashboard'
+            ? 'bg-brand-teal text-white'
+            : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
+            }`}
         >
           الطلاب
         </button>
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex-1 text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-            activeTab === 'attendance' 
-              ? 'bg-brand-teal text-white' 
-              : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
-          }`}
+          className={`flex-1 text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${activeTab === 'attendance'
+            ? 'bg-brand-teal text-white'
+            : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
+            }`}
         >
           التحضير
         </button>
         <button
           onClick={() => setActiveTab('gradesEntry')}
-          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-            activeTab === 'gradesEntry' 
-              ? 'bg-brand-teal text-white' 
-              : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
-          }`}
+          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${activeTab === 'gradesEntry'
+            ? 'bg-brand-teal text-white'
+            : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
+            }`}
         >
           الدرجات
         </button>
         <button
           onClick={() => setActiveTab('parentPortal')}
-          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-            activeTab === 'parentPortal' 
-              ? 'bg-brand-teal text-white' 
-              : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
-          }`}
+          className={`flex-1 min-w-[85px] text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${activeTab === 'parentPortal'
+            ? 'bg-brand-teal text-white'
+            : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
+            }`}
         >
           ولي الأمر
         </button>
         <button
           onClick={() => setActiveTab('appsScript')}
-          className={`flex-1 text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'appsScript' 
-              ? 'bg-brand-teal text-white' 
-              : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
-          }`}
+          className={`flex-1 text-center py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'appsScript'
+            ? 'bg-brand-teal text-white'
+            : 'text-slate-600 bg-slate-50 hover:text-brand-teal'
+            }`}
         >
           <Code className="w-3.5 h-3.5" /> Apps Script
         </button>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        
-        {/* Spreadsheet Sync Controller Panel */}
-        {!loggedInStudent && activeTab !== 'parentPortal' && !needsAuth && loggedInTeacher?.role === 'Admin' && (
-          <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex items-start sm:items-center gap-3">
-              <div className="p-2.5 bg-blue-50 rounded-xl text-blue-600 shrink-0 border border-blue-100">
-                <FileSpreadsheet className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xs font-bold text-slate-800">قاعدة بيانات Google Sheets المتصلة</h2>
-                {spreadsheetTitle ? (
-                  <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <span className="text-emerald-700 font-bold text-[11px] bg-green-50 px-2 py-0.5 rounded-md border border-green-100">
-                      مستند نشط: {spreadsheetTitle}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-mono select-all">
-                      ID: {spreadsheetId}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-slate-500 mt-1">يرجى تحديد أو إنشاء جدول بيانات جديد في حسابك لحفظ الطلاب وسحب السجلات.</p>
-                )}
-              </div>
-            </div>
 
-            <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-              <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 border border-transparent">
-                <input
-                  type="text"
-                  placeholder="رقم المستند (Spreadsheet ID)"
-                  value={spreadsheetId}
-                  onChange={(e) => setSpreadsheetId(e.target.value.trim())}
-                  className="bg-transparent border-0 outline-none px-3 py-1.5 text-xs font-mono w-48 md:w-64 text-slate-700"
-                />
+        {/* Spreadsheet Sync Controller Panel */}
+        {!loggedInStudent && activeTab !== 'parentPortal' && !needsAuth && user && !spreadsheetId && (
+          <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3">
+                <div className="p-2.5 bg-blue-50 rounded-xl text-blue-600 shrink-0 border border-blue-100">
+                  <FileSpreadsheet className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xs font-bold text-slate-800">قاعدة بيانات Google Sheets المتصلة</h2>
+                  {spreadsheetTitle ? (
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <span className="text-emerald-700 font-bold text-[11px] bg-green-50 px-2 py-0.5 rounded-md border border-green-100">
+                        مستند نشط: {spreadsheetTitle}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono select-all">
+                        ID: {spreadsheetId}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-500 mt-1">يرجى تحديد أو إنشاء جدول بيانات جديد في حسابك لحفظ الطلاب وسحب السجلات.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 border border-transparent">
+                  <input
+                    type="text"
+                    placeholder="رقم المستند (Spreadsheet ID)"
+                    value={spreadsheetId}
+                    onChange={(e) => setSpreadsheetId(e.target.value.trim())}
+                    className="bg-transparent border-0 outline-none px-3 py-1.5 text-xs font-mono w-48 md:w-64 text-slate-700"
+                  />
+                  <button
+                    onClick={loadSpreadsheetDetails}
+                    disabled={isConnecting || !spreadsheetId}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold text-xs px-4 py-1.5 rounded-lg transition-all cursor-pointer shadow-sm"
+                  >
+                    {isConnecting ? 'جاري الاتصال...' : 'ربط المستند'}
+                  </button>
+                </div>
+
+                <span className="text-xs text-slate-400 font-medium px-1">أو</span>
+
                 <button
-                  onClick={loadSpreadsheetDetails}
-                  disabled={isConnecting || !spreadsheetId}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold text-xs px-4 py-1.5 rounded-lg transition-all cursor-pointer shadow-sm"
+                  onClick={handleCreateNewSpreadsheet}
+                  disabled={isConnecting}
+                  className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  {isConnecting ? 'جاري الاتصال...' : 'ربط المستند'}
+                  <Plus className="w-3.5 h-3.5" /> إنشاء قاعدة بيانات جديدة مسبقة الإعداد
                 </button>
               </div>
-
-              <span className="text-xs text-slate-400 font-medium px-1">أو</span>
-
-              <button
-                onClick={handleCreateNewSpreadsheet}
-                disabled={isConnecting}
-                className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" /> إنشاء قاعدة بيانات جديدة مسبقة الإعداد
-              </button>
             </div>
-          </div>
 
-          {spreadsheetError && (
-            <div className="mt-3 p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-[11px] flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-              <p className="font-semibold">{spreadsheetError}</p>
-            </div>
-          )}
-        </section>
+            {spreadsheetError && (
+              <div className="mt-3 p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-[11px] flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                <p className="font-semibold">{spreadsheetError}</p>
+              </div>
+            )}
+          </section>
         )}
 
         {activeTab === 'gradesEntry' && ((needsAuth || loggedInTeacher?.role !== 'Admin') ? renderTeacherLoginRequired() : (
@@ -1768,9 +1754,8 @@ export default function App() {
                               setGradesStudentCode(std.code);
                               setGradesStudentName(std.name);
                             }}
-                            className={`p-3 text-right hover:bg-brand-teal/5 transition-all cursor-pointer flex justify-between items-center ${
-                              isSelected ? 'bg-brand-teal/5 border-r-4 border-brand-teal font-black text-brand-teal' : ''
-                            }`}
+                            className={`p-3 text-right hover:bg-brand-teal/5 transition-all cursor-pointer flex justify-between items-center ${isSelected ? 'bg-brand-teal/5 border-r-4 border-brand-teal font-black text-brand-teal' : ''
+                              }`}
                           >
                             <div className="text-right">
                               <h4 className="text-xs font-bold text-slate-800">{std.name}</h4>
@@ -1792,7 +1777,7 @@ export default function App() {
 
         {activeTab === 'teacherDashboard' && ((needsAuth || loggedInTeacher?.role !== 'Admin') ? renderTeacherLoginRequired() : (
           <div className="space-y-6 animate-fade-in text-right" dir="rtl">
-            
+
             {/* 1. Date Selector Card */}
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-md">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -1807,7 +1792,7 @@ export default function App() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/50 rounded-2xl px-4 py-2 w-full sm:w-auto justify-between sm:justify-start">
                   <span className="text-xs font-bold text-slate-600">تاريخ الإحصائيات:</span>
                   <input
@@ -1952,7 +1937,7 @@ export default function App() {
                         <tbody className="divide-y divide-slate-100">
                           {filteredDashboardStudents.map((student) => {
                             const studentLogs = attendanceLogs.filter(l => l.studentCode === student.code);
-                            
+
                             // Log on selected date
                             const selectedDateLog = studentLogs.find(l => l.date === dashboardDate);
                             const loggedStatus = selectedDateLog?.status;
@@ -1960,11 +1945,10 @@ export default function App() {
                             const isSelectedHistory = selectedHistoryStudentCode === student.code;
 
                             return (
-                              <tr 
-                                key={student.code} 
-                                className={`text-xs text-slate-700 hover:bg-slate-50/65 transition-colors ${
-                                  isSelectedHistory ? 'bg-blue-50/40' : ''
-                                }`}
+                              <tr
+                                key={student.code}
+                                className={`text-xs text-slate-700 hover:bg-slate-50/65 transition-colors ${isSelectedHistory ? 'bg-blue-50/40' : ''
+                                  }`}
                               >
                                 <td className="py-3 px-4 font-mono font-bold text-slate-500">#{student.code}</td>
                                 <td className="py-3 px-3">
@@ -1976,13 +1960,12 @@ export default function App() {
                                   </span>
                                 </td>
                                 <td className="py-3 px-3 text-center">
-                                  <span className={`font-bold px-2 py-0.5 rounded-md border text-[11px] ${
-                                    student.attendancePercentage >= 90 
-                                      ? 'bg-green-50 text-green-600 border-green-100' 
-                                      : student.attendancePercentage >= 75 
-                                      ? 'bg-amber-50 text-amber-600 border-amber-100' 
+                                  <span className={`font-bold px-2 py-0.5 rounded-md border text-[11px] ${student.attendancePercentage >= 90
+                                    ? 'bg-green-50 text-green-600 border-green-100'
+                                    : student.attendancePercentage >= 75
+                                      ? 'bg-amber-50 text-amber-600 border-amber-100'
                                       : 'bg-rose-50 text-rose-600 border-rose-100'
-                                  }`}>
+                                    }`}>
                                     {student.attendancePercentage}%
                                   </span>
                                 </td>
@@ -2086,7 +2069,7 @@ export default function App() {
 
                           <div className="border-t border-slate-100 pt-3">
                             <h5 className="text-[10px] font-bold text-slate-400 mb-2 uppercase">تواريخ الحضور والغياب المسجلة ({sortedLogs.length})</h5>
-                            
+
                             {sortedLogs.length === 0 ? (
                               <p className="text-[10px] text-slate-400 italic py-4 text-center">لا توجد سجلات حضور مسجلة لهذا الطالب في المستند بعد.</p>
                             ) : (
@@ -2209,7 +2192,7 @@ export default function App() {
 
             {/* Core Workspace Grid Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
+
               {/* Left Column: Focused Student Detail Card (Modern Card - Core Requirement) */}
               <div className="lg:col-span-1">
                 <div className="sticky top-6">
@@ -2244,16 +2227,14 @@ export default function App() {
                         <div>
                           <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold mb-1">
                             <span>نسبة حضور الطالب</span>
-                            <span className={`font-bold text-xs ${
-                              selectedStudent.attendancePercentage >= 90 ? 'text-green-600' : selectedStudent.attendancePercentage >= 75 ? 'text-amber-500' : 'text-rose-500'
-                            }`}>{selectedStudent.attendancePercentage}%</span>
+                            <span className={`font-bold text-xs ${selectedStudent.attendancePercentage >= 90 ? 'text-green-600' : selectedStudent.attendancePercentage >= 75 ? 'text-amber-500' : 'text-rose-500'
+                              }`}>{selectedStudent.attendancePercentage}%</span>
                           </div>
-                          
+
                           <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                selectedStudent.attendancePercentage >= 90 ? 'bg-green-500' : selectedStudent.attendancePercentage >= 75 ? 'bg-amber-400' : 'bg-rose-500'
-                              }`}
+                            <div
+                              className={`h-full rounded-full transition-all duration-300 ${selectedStudent.attendancePercentage >= 90 ? 'bg-green-500' : selectedStudent.attendancePercentage >= 75 ? 'bg-amber-400' : 'bg-rose-500'
+                                }`}
                               style={{ width: `${selectedStudent.attendancePercentage}%` }}
                             ></div>
                           </div>
@@ -2326,14 +2307,14 @@ export default function App() {
                               </div>
                               <span className="text-xs font-bold text-slate-800 font-mono">{selectedStudent.exam2 || '-'} <span className="text-[9px] text-slate-400 font-normal">/ 100</span></span>
                             </div>
-                            
+
                             {/* Average calculation */}
                             {(() => {
                               const score1 = parseFloat(selectedStudent.exam1 as string) || 0;
                               const score2 = parseFloat(selectedStudent.exam2 as string) || 0;
                               const hasScores = selectedStudent.exam1 || selectedStudent.exam2;
                               const avgScore = hasScores ? ((score1 + score2) / (selectedStudent.exam1 && selectedStudent.exam2 ? 2 : 1)).toFixed(1) : '-';
-                              
+
                               return hasScores ? (
                                 <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
                                   <div className="flex justify-between items-center mb-1">
@@ -2434,12 +2415,11 @@ export default function App() {
                             }
 
                             return (
-                              <tr 
+                              <tr
                                 key={student.code}
                                 onClick={() => setSelectedStudent(student)}
-                                className={`group hover:bg-slate-50/70 transition-all cursor-pointer text-xs ${
-                                  isFocused ? 'bg-blue-50/70 font-semibold' : ''
-                                }`}
+                                className={`group hover:bg-slate-50/70 transition-all cursor-pointer text-xs ${isFocused ? 'bg-blue-50/70 font-semibold' : ''
+                                  }`}
                               >
                                 <td className="py-3 px-4 font-mono font-bold text-blue-600">
                                   {student.code}
@@ -2553,7 +2533,7 @@ export default function App() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 w-full sm:w-auto justify-between sm:justify-start">
                   <span className="text-xs font-bold text-slate-600">التاريخ المحدد:</span>
                   <input
@@ -2621,12 +2601,12 @@ export default function App() {
               (() => {
                 // Group students by Grade
                 const studentsByGrade: Record<string, Student[]> = {};
-                
+
                 // First filter by search
                 const query = attendanceSearch.trim().toLowerCase();
-                const matchedStudents = students.filter(s => 
-                  !query || 
-                  s.name.toLowerCase().includes(query) || 
+                const matchedStudents = students.filter(s =>
+                  !query ||
+                  s.name.toLowerCase().includes(query) ||
                   s.code.toLowerCase().includes(query)
                 );
 
@@ -2634,7 +2614,7 @@ export default function App() {
                   return (
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 text-center animate-fade-in">
                       <p className="text-slate-500 text-xs font-semibold">لم يتم العثور على أي طالب يطابق "{attendanceSearch}"</p>
-                      <button 
+                      <button
                         onClick={() => setAttendanceSearch('')}
                         className="mt-3 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-[11px] font-bold rounded-lg transition-all cursor-pointer"
                       >
@@ -2735,7 +2715,7 @@ export default function App() {
                                       <td className="py-2.5 px-4 font-mono font-bold text-blue-600">
                                         {student.code}
                                       </td>
-                                      
+
                                       {/* Name */}
                                       <td className="py-2.5 px-4 font-bold text-slate-800">
                                         {student.name}
@@ -2884,11 +2864,10 @@ export default function App() {
                         setActiveScriptFile(fileName);
                         setCopiedState(false);
                       }}
-                      className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
-                        activeScriptFile === fileName 
-                          ? 'bg-white text-blue-600 shadow-sm' 
-                          : 'text-slate-600 hover:text-slate-800'
-                      }`}
+                      className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${activeScriptFile === fileName
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-800'
+                        }`}
                     >
                       {fileName}
                     </button>
@@ -3016,13 +2995,12 @@ export default function App() {
                         </h3>
                         <p className="text-[10px] text-slate-400 mt-1">نسبة الحضور التراكمية لطالب منذ بدء العام الدراسي.</p>
                       </div>
-                      <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-lg border ${
-                        parentFinalPercentage >= 90
-                          ? 'bg-green-50 text-emerald-600 border-green-100'
-                          : parentFinalPercentage >= 75
+                      <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-lg border ${parentFinalPercentage >= 90
+                        ? 'bg-green-50 text-emerald-600 border-green-100'
+                        : parentFinalPercentage >= 75
                           ? 'bg-amber-50 text-amber-600 border-amber-100'
                           : 'bg-rose-50 text-rose-600 border-rose-100'
-                      }`}>
+                        }`}>
                         {parentFinalPercentage}%
                       </span>
                     </div>
@@ -3059,7 +3037,7 @@ export default function App() {
                     {(() => {
                       const studentGrades = gradeEntries.filter(entry => entry.studentCode.toLowerCase().trim() === loggedInStudent.code.toLowerCase().trim());
                       const totalExams = studentGrades.length;
-                      
+
                       let avgPct = 0;
                       if (totalExams > 0) {
                         const totalScore = studentGrades.reduce((sum, entry) => sum + (entry.score / entry.maxScore), 0);
@@ -3115,7 +3093,7 @@ export default function App() {
                   // Payment Status calculation
                   let statusText = '';
                   let statusBadgeColor = '';
-                  
+
                   if (studentPayments.length === 0) {
                     statusText = '🔴 غير مسدد';
                     statusBadgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
@@ -3231,7 +3209,7 @@ export default function App() {
 
                       {(() => {
                         const studentGrades = gradeEntries.filter(entry => entry.studentCode.toLowerCase().trim() === loggedInStudent.code.toLowerCase().trim());
-                        
+
                         if (studentGrades.length === 0) {
                           return (
                             <div className="p-12 text-center text-slate-400">
@@ -3412,7 +3390,7 @@ export default function App() {
                 <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                   <span>✏️</span> {formMode === 'add' ? 'إضافة طالب جديد لقاعدة البيانات' : 'تعديل بيانات الطالب الفنية'}
                 </h4>
-                <button 
+                <button
                   onClick={() => setIsFormOpen(false)}
                   className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1 rounded-lg transition-all cursor-pointer"
                 >
@@ -3562,11 +3540,11 @@ export default function App() {
               <div className="text-rose-600 bg-rose-50 w-10 h-10 rounded-xl flex items-center justify-center mb-3.5 border border-rose-100">
                 <Trash2 className="w-5 h-5" />
               </div>
-              
+
               <h4 className="text-sm font-bold text-slate-800">حذف الطالب نهائياً من قاعدة البيانات؟</h4>
-              
+
               <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
-                هل أنت متأكد تماماً من رغبتك في حذف الطالب <strong>"{studentToDelete.name}"</strong> (كود: <code>{studentToDelete.code}</code>)؟ 
+                هل أنت متأكد تماماً من رغبتك في حذف الطالب <strong>"{studentToDelete.name}"</strong> (كود: <code>{studentToDelete.code}</code>)؟
                 سيتم حذف السطر الخاص به بالكامل من ورقة <strong>Google Sheets</strong> وإعادة ترتيب الأسطر التابعة له، ولا يمكن التراجع عن هذا الإجراء لاحقاً.
               </p>
 
@@ -3604,7 +3582,7 @@ export default function App() {
                 <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                   <span>💵</span> تحصيل المصروفات الدراسية
                 </h4>
-                <button 
+                <button
                   onClick={() => setCollectPaymentStudent(null)}
                   className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1 rounded-lg transition-all cursor-pointer"
                 >
