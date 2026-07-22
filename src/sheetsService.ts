@@ -189,7 +189,7 @@ function parseSheetsValues(rows: string[][]): Student[] {
   return rows.map((row, index) => {
     const attendance = parseInt(row[4] || '0', 10) || 0;
     const absence = parseInt(row[5] || '0', 10) || 0;
-    
+
     // Parse attendance percentage
     let percentage = 100;
     if (row[6]) {
@@ -312,7 +312,7 @@ export async function updateStudent(accessToken: string, spreadsheetId: string, 
  */
 export async function deleteStudent(accessToken: string, spreadsheetId: string, rowIndex: number): Promise<void> {
   const sheetName = await getActiveSheetName(accessToken, spreadsheetId);
-  
+
   // Retrieve spreadsheet metadata to get the sheetId of the active sheet
   const metadataResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties(sheetId,title))`, {
     headers: { 'Authorization': `Bearer ${accessToken}` }
@@ -771,7 +771,7 @@ export async function fetchUsers(accessToken: string, spreadsheetId: string): Pr
 
   const data = await response.json();
   const rows = data.values || [];
-
+  console.log('Users rows from Google Sheets:', rows);
   return rows.map((row: any) => ({
     username: row[0] || '',
     password: row[1] || '',
