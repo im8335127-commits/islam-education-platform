@@ -1492,7 +1492,7 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
 
         {/* Spreadsheet Sync Controller Panel */}
-        {!loggedInStudent && activeTab !== 'parentPortal' && !needsAuth && user && !spreadsheetId && (
+        {!loggedInStudent && activeTab !== 'parentPortal' && !needsAuth && user && loggedInTeacher?.role === 'Admin' && !spreadsheetId && (
           <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="flex items-start sm:items-center gap-3">
