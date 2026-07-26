@@ -1337,7 +1337,8 @@ export default function App() {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="hidden md:flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1">
+          {!needsAuth && loggedInTeacher && (
+  <div className="hidden md:flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1">
             <button
               onClick={() => setActiveTab('teacherDashboard')}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'teacherDashboard'
@@ -1393,7 +1394,7 @@ export default function App() {
               <Code className="w-3.5 h-3.5" /> Apps Script
             </button>
           </div>
-
+        )}
           {/* Profile Info & Logout */}
           <div className="flex items-center gap-3">
             {loggedInStudent ? (
