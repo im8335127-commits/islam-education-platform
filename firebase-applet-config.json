@@ -1,9 +1,10 @@
 {
-  "apiKey": "AIzaSyCXSTFPSqvP65VMzb_varakiNK6Yag6DuI",
-  "authDomain": "islam-education-platform.firebaseapp.com",
-  "projectId": "islam-education-platform",
-  "storageBucket": "islam-education-platform.firebasestorage.app",
-  "messagingSenderId": "400505074085",
-  "appId": "1:400505074085:web:e67daca73487cad18ff84c",
-  "measurementId": "G-ZVD57VQ2VR"
+  "projectId": "gen-lang-client-0056633251",
+  "appId": "1:306275128133:web:c438ec0af227b561d9e42c",
+  "apiKey": "",
+  "authDomain": "gen-lang-client-0056633251.firebaseapp.com",
+  "storageBucket": "gen-lang-client-0056633251.firebasestorage.app",
+  "messagingSenderId": "306275128133",
+  "measurementId": "",
+  "oAuthClientId": "306275128133-n7chdsgjju9d19tfjbn8fh4e9lj8sg74.apps.googleusercontent.com"
 }
