@@ -1,8 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import { processParentLookup } from './src/parentLookupService.js';
-
+import { processParentLookup } from './src/parentLookupService';
 async function startServer() {
   const app = express();
   const PORT = 3000;
