@@ -437,14 +437,22 @@ export default function App() {
       }
 
       // Find student matching code and parent phone (column D / .phone)
-      const normalizedInputCode = parentCode.trim().toLowerCase();
-      const normalizedInputPhone = parentPhone.trim();
+     const normalizePhone = (phone: any) =>
+  String(phone ?? '')
+    .replace(/\s+/g, '')
+    .replace(/-/g, '')
+    .replace(/^(\+20|20)/, '0')
+    .trim();
 
-      const matched = freshStudents.find(student => {
-        const dbCode = (student.code || '').trim().toLowerCase();
-        const dbPhone = (student.phone || '').trim();
-        return dbCode === normalizedInputCode && dbPhone === normalizedInputPhone;
-      });
+const normalizedInputCode = parentCode.trim().toLowerCase();
+const normalizedInputPhone = normalizePhone(parentPhone);
+
+const matched = freshStudents.find(student => {
+  const dbCode = String(student.code ?? '').trim().toLowerCase();
+  const dbPhone = normalizePhone(student.phone);
+
+  return dbCode === normalizedInputCode && dbPhone === normalizedInputPhone;
+});
 
       if (matched) {
         setLoggedInStudent(matched);
