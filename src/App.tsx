@@ -64,9 +64,12 @@ export default function App() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Spreadsheet state
-  const [spreadsheetId, setSpreadsheetId] = useState<string>(() => {
-    return localStorage.getItem('student_mgmt_spreadsheet_id') || '';
-  });
+ const [spreadsheetId, setSpreadsheetId] = useState<string>(() => {
+  return (
+    localStorage.getItem('student_mgmt_spreadsheet_id') ||
+    '1Ad_7EM4yjJzmktbhBoDscd4sima3gD0_d1k3SIx40T8'
+  );
+});
   const [spreadsheetTitle, setSpreadsheetTitle] = useState<string>('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [spreadsheetError, setSpreadsheetError] = useState<string | null>(null);
@@ -324,7 +327,7 @@ export default function App() {
       return;
     }
 
-    if (!token || !spreadsheetId) {
+    if (!token) {
       setTeacherLoginError('يرجى ربط مستند Google Sheets أولاً عبر حساب Google الخاص بك.');
       return;
     }
