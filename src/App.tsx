@@ -453,7 +453,7 @@ const normalizePhone = (phone: any) =>
 
 const normalizedInputCode = parentCode.trim().toLowerCase();
 const normalizedInputPhone = normalizePhone(parentPhone);
-
+console.log(freshStudents);
 const matched = freshStudents.find(student => {
   const dbCode = String(student.code ?? '').trim().toLowerCase();
   const dbPhone = normalizePhone(student.phone);
