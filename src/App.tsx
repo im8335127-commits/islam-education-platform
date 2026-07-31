@@ -444,6 +444,13 @@ export default function App() {
     .replace(/^(\+20|20)/, '0')
     .trim();
 
+const normalizePhone = (phone: any) =>
+  String(phone ?? '')
+    .replace(/\s+/g, '')
+    .replace(/-/g, '')
+    .replace(/^(\+20|20)/, '0')
+    .trim();
+
 const normalizedInputCode = parentCode.trim().toLowerCase();
 const normalizedInputPhone = normalizePhone(parentPhone);
 
